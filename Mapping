@@ -1,0 +1,73 @@
+Mapping
+
+library(ggplot2)
+library(maptools)
+library(rgdal)
+library(maptools)
+#if (!require(gpclib)) install.packages("gpclib", type="source")
+#gpclibPermit()
+library(scales)
+library(ggmap)
+library(RColorBrewer)
+
+
+setwd("C:/Users/OVID/Documents/Map")
+
+
+fsas <- readShapeSpatial("gfsa000a11a_e.shp")
+
+
+
+
+toronto.fsa.list <- fsas@data$CFSAUID[c(800:821,827:831,832:841,843,882,738,845,846,973:978,980:982,812:820)]
+
+
+toronto.fsas <- fsas[fsas$CFSAUID %in% toronto.fsa.list,]
+#rm(fsas)
+plot(toronto.fsas)
+
+
+dataset <- read.csv("file:///C:/Users/OVID/Desktop/By RIW Map.csv", na.strings=c("NULL",".", "NA", "", "?"), strip.white=TRUE, encoding="UTF-8")
+
+
+fill.values <- fortify(toronto.fsas, region = "CFSAUID")
+#class(fill.values)
+
+
+merged.map<-merge(fill.values, dataset, by="id", all.x=TRUE)
+final.plot<-merged.map[order(merged.map$order), ]
+
+
+
+
+#Queensway
+d <- data.frame(lat=c(43.571944,43.5594),
+                lon=c(-79.607778,-79.7029))
+
+
+
+
+#Could use discrete or continous labels
+#basic plot
+ggplot() +
+  geom_polygon(data = final.plot,
+               aes(x = long, y = lat, group = group, fill = Count),
+               color = "white", size = 0.25) +
+  coord_map()
+
+
+ggplot() +
+  geom_polygon(data = final.plot,
+               aes(x = long, y = lat, group = group, fill = Count),
+               color = "black", size = 0.25) +
+  coord_map()+
+  scale_fill_distiller(name="Total RIW", trans='reverse', palette = "Blues")+
+  theme_nothing(legend = TRUE)+
+  labs(title="")+
+  geom_point(aes(lon, lat,fill = NULL,group = NULL), colour = "goldenrod3", size = 4,data=d)
+
+
+#+theme(text=element_text(family = "Cambria", size=10))
+
+
+#display.brewer.all()
