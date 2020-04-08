@@ -1,0 +1,101 @@
+Absentism
+
+
+library (Rcmdr)
+library(rattle)
+rattle()
+
+
+Dataset <- within(Dataset, {
+      BoardC <- as.factor(BoardC)
+      BoardL <- as.factor(BoardL)
+      CompanyC <- as.factor(CompanyC)
+      JobL <- as.factor(JobL)
+    })
+
+GLM.1 <- glm(JobL ~ Quadrant + Gender + CompanyC + BoardL + BoardC,
+                 family=binomial(logit), data=Dataset)
+
+
+summary(GLM.1)
+
+
+#summary(GLM.1)
+#round(cbind((exp(coef(GLM.1))-1)*100),3)
+  #step_glm<-step(GLM.1)
+#options(scipen=999)
+
+
+GLM.2 <- glm(Gender ~ Quadrant,
+            family=binomial(logit), data=Dataset)
+
+summary(GLM.2)
+
+GLM.3 <- glm(Gender ~ Eval + Exp + Idea + Think, family=binomial(logit), data=Dataset)
+
+summary(GLM.3)
+
+GLM.4 <- glm(Quadrant~ JobL, family=binomial(logit), data=Dataset)
+
+summary(GLM.4)
+
+GLM.5 <- glm(Eval ~ JobL, family=binomial(logit), data=Dataset)
+
+summary(GLM.5)
+
+
+
+library(mvtnorm, pos=17)
+
+
+library(survival, pos=17)
+
+
+library(MASS, pos=17)
+
+
+library(TH.data, pos=17)
+
+
+library(multcomp, pos=17)
+
+
+library(abind, pos=22)
+
+
+AnovaMode3 <- aov(Idea ~ Gender, data=Dataset)
+
+
+summary(AnovaMode3)
+
+
+with(Dataset, numSummary(Idea, groups=Gender, statistics=c("mean", "sd")))
+
+
+posthoc <- TukeyHSD(x=AnovaMode3, 'Gender', conf.level=0.95)
+posthoc
+
+
+
+
+local({
+     .Pairs <- glht(AnovaModel.35, linfct = mcp(BoardC = "Tukey"))
+     print(summary(.Pairs)) # pairwise tests
+     print(confint(.Pairs)) # confidence intervals
+     print(cld(.Pairs)) # compact letter display
+     old.oma <- par(oma=c(0,5,0,0))
+     plot(confint(.Pairs))
+     par(old.oma)
+   })
+
+
+AnovaModel.9 <- aov(Idea ~ CompanyC, data=Dataset)
+
+
+summary(AnovaModel.9)
+
+
+with(Dataset, numSummary(Idea, groups=CompanyC, statistics=c("mean", "sd")))
+
+
+posthoc <- TukeyHSD(x=AnovaModel.9, 'CompanyC', conf.level=0.95)
