@@ -1,0 +1,113 @@
+################################## PRESET ####################################
+library(tm)
+#library(e1071)
+#library(caret)
+#library(randomForest)
+library(plyr)
+library(adabag)
+setwd("C:/Users/Peter Zhang/Desktop/NLP/Metro")
+
+############################### DATA CLEANING ####################################
+
+data <-read.csv("Marks.csv", sep=",", header = TRUE)
+# Corpus is pointing to the text portion, the label is still there
+docs <- VCorpus(VectorSource(data$Name))
+# Lower Case
+clean.docs <- tm_map(docs, content_transformer(tolower))
+# as.character(docs[[1]]) Checking before and after, have to convert the object back into character
+# Remove Numbers
+clean.docs <- tm_map(clean.docs, removeNumbers)
+# Not going to remove Sparse or introduce Stop Words, because the text themselves are not that
+# long, and therefore all information are needed
+# Keep this to inprove performance
+# clean.docs2 <- tm_map(clean.docs, stemDocument)
+# Remove Puncutations
+clean.docs <- tm_map(clean.docs, removePunctuation)
+#Might be done after Stemming
+clean.docs <- tm_map(clean.docs, stripWhitespace)
+# These are leading indicators for credit cards
+clean.docs <- tm_map(clean.docs, removeWords, c("xxx", "xxxx","xxxxx","xxxxxx","xxxxxxx",
+                                    "xxxxxxxx","xxxxxxxxx"))
+
+################################## DTM ####################################
+dtm <- DocumentTermMatrix(clean.docs)
+# Theretical point about if removing Sparse is correct or not.
+# dtm <- removeSparseTerms(dtm,sparse = 0.99)
+
+
+# Results might be different based on sequence in steps and if you clean up
+# before or after tokenization
+# sms_dtm2 <- DocumentTermMatrix(smsDataCorpus,
+# control = list(tolower=TRUE,
+#               removeNumbers=TRUE,
+#               stopwords=TRUE,
+#               removePunctuation=TRUE,
+#               stemming=TRUE))
+# Do this only if a term repeats frequently, as in an article
+# matrix <- as.matrix(weightTfIdf(dtm))
+matrix <- as.matrix(dtm)
+dtm_train_matrix <- as.data.frame(cbind(matrix, lable=data$Lable))
+dtm_train_matrix$lable <-as.factor(dtm_train_matrix$lable)
+
+
+#There are invalid names which gives error, need following code to fix
+#Error in `[.data.frame`(m, labs) : undefined columns selected
+colnames(dtm_train_matrix) <- make.names(colnames(dtm_train_matrix))
+################################## MODELLING ####################################
+
+# Adaboost can do multiclass
+model_ada <- boosting(lable ~ ., data = dtm_train_matrix, boos = TRUE, mfinal = 10)
+saveRDS(model_ada, file = "Leons_Model.rds")
+# More models and diagnostics needed
+
+
+
+################################### TEST ####################################
+test <-read.csv("Marks Test.csv", sep=",", header = TRUE)
+docs_test <- VCorpus(VectorSource(test$Name))
+clean.docs_test <- tm_map(docs_test, content_transformer(tolower))
+clean.docs_test <- tm_map(clean.docs_test, removeNumbers)
+clean.docs_test <- tm_map(clean.docs_test, removePunctuation)
+clean.docs_test <- tm_map(clean.docs_test, stripWhitespace)
+clean.docs_test <- tm_map(clean.docs_test, removeWords, c("xxx", "xxxx","xxxxx","xxxxxx","xxxxxxx",
+                                                "xxxxxxxx","xxxxxxxxx","achat",
+                                                "and"))
+dtm_test <- DocumentTermMatrix(clean.docs_test)
+# new_dtm_corpus_test <- removeSparseTerms(dtm_test,sparse = 0.99)
+# matrix_test <- as.matrix(weightTfIdf(dtm_test))
+matrix_test <- as.matrix(dtm_test)
+dtm_matrix_test <- as.data.frame(matrix_test)
+# subset testing data by colnames (ie. terms) or training data
+xx <- data.frame(dtm_matrix_test[,intersect(colnames(dtm_matrix_test),
+                                            colnames(dtm_train_matrix))])
+# make an empty data frame with the colnames of the training data
+yy <- read.table(textConnection(""), col.names = colnames(dtm_train_matrix),
+                 colClasses = "integer")
+# add incols of NAs for terms absent in the
+# testing data but present # in the training data
+# following SchaunW's suggestion in the comments above
+zz <- rbind.fill(xx, yy)
+zz[is.na(zz)] <- 0
+results_test <- predict(model_ada, zz)
+# out_test<- cbind(test, zz, results_test)
+result <- cbind(test, results_test$prob, results_test$class)
+write.csv(result,"classification.csv")
+################################## APPENDIX ####################################
+# Not advisible when the corpus is too large
+library(wordcloud)
+wordcloud(clean.docs, min.freq = 50, random.order = FALSE)
+
+set.seed(444) # Set Seed so that same sample can be reproduced in future also
+# Now Selecting 75% of data as sample from total 'n' rows of the data  
+sample <- sample.int(n = nrow(dtm), size = floor(.75*nrow(dtm)), replace = F)
+dtm_train <- dtm[sample, ]
+dtm_test  <- dtm[-sample, ]
+
+
+train_lable <- data[sample, ]$Lable
+test_lable  <- data[-sample, ]$Lable
+
+# To confirm that the subsets are representative of the complete set of SMS data, let's
+# compare the proportion of spam in the training and test data frames:
+prop.table(table(train_label))
+prop.table(table(test_label))
