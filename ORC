@@ -1,0 +1,15 @@
+ORC
+
+library(pdftools)
+library(tiff)
+library(tesseract)
+
+
+#Can only deal with one page
+
+
+setwd("C:/Users/OVID/Desktop")
+news <- file.path("IMG_20190521_183407.jpg")
+eng <- tesseract("eng")
+text <- tesseract::ocr(news, engine = eng)
+cat(text)
