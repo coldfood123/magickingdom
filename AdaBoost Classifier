@@ -1,0 +1,502 @@
+#Load Dataset 2009 to 2014 only (6 years)
+
+dataset <- read.csv("file:///C:/Users/Peter/Desktop/Training End FY15 New Dx.csv", na.strings=c(".", "NA", "", "?"), strip.white=TRUE, encoding="UTF-8")
+
+dataset$AgeNumber <- as.factor(dataset$AgeNumber)  
+dataset$WaitTimeER <- as.numeric(dataset$WaitTimeER)
+dataset$EntryCode <- as.factor(dataset$EntryCode)
+dataset$HIGWeight  <- as.numeric(dataset$HIGWeight)
+dataset$HIGELOS  <- as.numeric(dataset$HIGELOS)
+dataset$LOSDays  <- as.numeric(dataset$LOSDays)
+dataset$AcuteLOS  <- as.numeric(dataset$AcuteLOS)
+dataset$ALCLOS  <- as.numeric(dataset$ALCLOS)
+dataset$SCULOS  <- as.numeric(dataset$SCULOS)
+dataset$SCUHours  <- as.numeric(dataset$SCUHours)
+dataset$SCUNumber <-as.factor(dataset$SCUNumber)
+
+# Build model
+
+library(ada)
+ada.vad <- ada::ada(FI_CardioversionFlag ~ . - EncounterNumber - AdmitDate - DischargeDate -
+                      CMG_RIW - PostalCode -CMG_ELOS - CMG_Year - HIGFlTotalCount -
+                      DisplayCode - DefaultDescription,
+                    data=dataset,
+                    control=rpart::rpart.control(maxdepth=20,
+                                                 minsplit=15,
+                                                 xval=10),
+                    iter=120)
+save (ada.vad, file = 'New Test Cardio.RData')
+
+summary(ada.vad)
+
+# Plot training error versus iteration, could be used to reduce computation time.
+plot(ada.vad,tflag=TRUE)
+
+
+#Variables that are most used, may be used in presentations to make the story make more sense.
+pairs(ada.vad, train.data = NULL, vars = NULL, maxvar = 10,
+      test.x = NULL, test.y = NULL,
+      test.only = FALSE,col=c(2,4),pch=c(1,2))
+varplot(ada.vad, plot.it = TRUE, type = c("none","scores"),max.var.show=15)
+
+
+#Load test data
+setwd("G:/Prometheus")
+
+
+dataset.new <- read.csv("Testing Begining FY16.csv", na.strings=c(".", "NA", "", "?"),
+                        strip.white=TRUE, encoding="UTF-8")
+
+
+dataset <- read.csv("Training End of FY15.csv",
+                    na.strings=c(".", "NA", "", "?"), strip.white=TRUE, encoding="UTF-8")
+
+
+#dataset.new$SCUNumber <- as.numeric(dataset.new$SCUNumber)
+# Remove any new features in test dataset
+
+
+id <-which(!(dataset.new$Diagnosis1 %in% levels(dataset$Diagnosis1)))    
+dataset.new$Diagnosis1[id] <- NA
+id <-which(!(dataset.new$Diagnosis2 %in% levels(dataset$Diagnosis2)))    
+dataset.new$Diagnosis2[id] <- NA
+id <-which(!(dataset.new$Diagnosis3 %in% levels(dataset$Diagnosis3)))    
+dataset.new$Diagnosis3[id] <- NA
+id <-which(!(dataset.new$Diagnosis4 %in% levels(dataset$Diagnosis4)))    
+dataset.new$Diagnosis4[id] <- NA
+id <-which(!(dataset.new$Diagnosis5 %in% levels(dataset$Diagnosis5)))    
+dataset.new$Diagnosis5[id] <- NA
+id <-which(!(dataset.new$Diagnosis6 %in% levels(dataset$Diagnosis6)))    
+dataset.new$Diagnosis6[id] <- NA
+id <-which(!(dataset.new$Diagnosis7 %in% levels(dataset$Diagnosis7)))    
+dataset.new$Diagnosis7[id] <- NA
+id <-which(!(dataset.new$Diagnosis8 %in% levels(dataset$Diagnosis8)))    
+dataset.new$Diagnosis8[id] <- NA
+id <-which(!(dataset.new$Diagnosis9 %in% levels(dataset$Diagnosis9)))    
+dataset.new$Diagnosis9[id] <- NA
+id <-which(!(dataset.new$Diagnosis10 %in% levels(dataset$Diagnosis10)))    
+dataset.new$Diagnosis10[id] <- NA
+id <-which(!(dataset.new$Diagnosis11 %in% levels(dataset$Diagnosis11)))    
+dataset.new$Diagnosis11[id] <- NA
+id <-which(!(dataset.new$Diagnosis12 %in% levels(dataset$Diagnosis12)))    
+dataset.new$Diagnosis12[id] <- NA
+id <-which(!(dataset.new$Diagnosis13 %in% levels(dataset$Diagnosis13)))    
+dataset.new$Diagnosis13[id] <- NA
+id <-which(!(dataset.new$Diagnosis14 %in% levels(dataset$Diagnosis14)))    
+dataset.new$Diagnosis14[id] <- NA
+id <-which(!(dataset.new$Diagnosis15 %in% levels(dataset$Diagnosis15)))    
+dataset.new$Diagnosis15[id] <- NA
+id <-which(!(dataset.new$Diagnosis16 %in% levels(dataset$Diagnosis16)))    
+dataset.new$Diagnosis16[id] <- NA
+id <-which(!(dataset.new$Diagnosis17 %in% levels(dataset$Diagnosis17)))    
+dataset.new$Diagnosis17[id] <- NA
+id <-which(!(dataset.new$Diagnosis18 %in% levels(dataset$Diagnosis18)))    
+dataset.new$Diagnosis18[id] <- NA
+id <-which(!(dataset.new$Diagnosis19 %in% levels(dataset$Diagnosis19)))    
+dataset.new$Diagnosis19[id] <- NA
+id <-which(!(dataset.new$Diagnosis20 %in% levels(dataset$Diagnosis20)))    
+dataset.new$Diagnosis20[id] <- NA
+id <-which(!(dataset.new$Diagnosis21 %in% levels(dataset$Diagnosis21)))    
+dataset.new$Diagnosis21[id] <- NA
+id <-which(!(dataset.new$Diagnosis22 %in% levels(dataset$Diagnosis22)))    
+dataset.new$Diagnosis22[id] <- NA
+id <-which(!(dataset.new$Diagnosis23 %in% levels(dataset$Diagnosis23)))    
+dataset.new$Diagnosis23[id] <- NA
+id <-which(!(dataset.new$Diagnosis24 %in% levels(dataset$Diagnosis24)))    
+dataset.new$Diagnosis24[id] <- NA
+id <-which(!(dataset.new$Diagnosis25 %in% levels(dataset$Diagnosis25)))    
+dataset.new$Diagnosis25[id] <- NA
+id <-which(!(dataset.new$Diagnosis26 %in% levels(dataset$Diagnosis26)))    
+dataset.new$Diagnosis26[id] <- NA
+id <-which(!(dataset.new$Diagnosis27 %in% levels(dataset$Diagnosis27)))    
+dataset.new$Diagnosis27[id] <- NA
+id <-which(!(dataset.new$Diagnosis28 %in% levels(dataset$Diagnosis28)))    
+dataset.new$Diagnosis28[id] <- NA
+id <-which(!(dataset.new$Diagnosis29 %in% levels(dataset$Diagnosis29)))    
+dataset.new$Diagnosis29[id] <- NA
+id <-which(!(dataset.new$Diagnosis30 %in% levels(dataset$Diagnosis30)))    
+dataset.new$Diagnosis30[id] <- NA
+id <-which(!(dataset.new$Diagnosis31 %in% levels(dataset$Diagnosis31)))    
+dataset.new$Diagnosis31[id] <- NA
+id <-which(!(dataset.new$Diagnosis32 %in% levels(dataset$Diagnosis32)))    
+dataset.new$Diagnosis32[id] <- NA
+id <-which(!(dataset.new$Diagnosis33 %in% levels(dataset$Diagnosis33)))    
+dataset.new$Diagnosis33[id] <- NA
+id <-which(!(dataset.new$Diagnosis34 %in% levels(dataset$Diagnosis34)))    
+dataset.new$Diagnosis34[id] <- NA
+id <-which(!(dataset.new$Diagnosis35 %in% levels(dataset$Diagnosis35)))    
+dataset.new$Diagnosis35[id] <- NA
+id <-which(!(dataset.new$Diagnosis36 %in% levels(dataset$Diagnosis36)))    
+dataset.new$Diagnosis36[id] <- NA
+id <-which(!(dataset.new$Diagnosis37 %in% levels(dataset$Diagnosis37)))    
+dataset.new$Diagnosis37[id] <- NA
+id <-which(!(dataset.new$Diagnosis38 %in% levels(dataset$Diagnosis38)))    
+dataset.new$Diagnosis38[id] <- NA
+id <-which(!(dataset.new$Diagnosis39 %in% levels(dataset$Diagnosis39)))    
+dataset.new$Diagnosis39[id] <- NA
+id <-which(!(dataset.new$Diagnosis40 %in% levels(dataset$Diagnosis40)))    
+dataset.new$Diagnosis40[id] <- NA
+id <-which(!(dataset.new$Diagnosis41 %in% levels(dataset$Diagnosis41)))    
+dataset.new$Diagnosis41[id] <- NA
+id <-which(!(dataset.new$Diagnosis42 %in% levels(dataset$Diagnosis42)))    
+dataset.new$Diagnosis42[id] <- NA
+id <-which(!(dataset.new$Diagnosis43 %in% levels(dataset$Diagnosis43)))    
+dataset.new$Diagnosis43[id] <- NA
+id <-which(!(dataset.new$Diagnosis44 %in% levels(dataset$Diagnosis44)))    
+dataset.new$Diagnosis44[id] <- NA
+id <-which(!(dataset.new$Diagnosis45 %in% levels(dataset$Diagnosis45)))    
+dataset.new$Diagnosis45[id] <- NA
+id <-which(!(dataset.new$Diagnosis46 %in% levels(dataset$Diagnosis46)))    
+dataset.new$Diagnosis46[id] <- NA
+id <-which(!(dataset.new$Diagnosis47 %in% levels(dataset$Diagnosis47)))    
+dataset.new$Diagnosis47[id] <- NA
+id <-which(!(dataset.new$Diagnosis48 %in% levels(dataset$Diagnosis48)))    
+dataset.new$Diagnosis48[id] <- NA
+id <-which(!(dataset.new$Diagnosis49 %in% levels(dataset$Diagnosis49)))    
+dataset.new$Diagnosis49[id] <- NA
+id <-which(!(dataset.new$Diagnosis50 %in% levels(dataset$Diagnosis50)))    
+dataset.new$Diagnosis50[id] <- NA
+id <-which(!(dataset.new$Diagnosis51 %in% levels(dataset$Diagnosis51)))    
+dataset.new$Diagnosis51[id] <- NA
+id <-which(!(dataset.new$Diagnosis52 %in% levels(dataset$Diagnosis52)))    
+dataset.new$Diagnosis52[id] <- NA
+id <-which(!(dataset.new$Diagnosis53 %in% levels(dataset$Diagnosis53)))    
+dataset.new$Diagnosis53[id] <- NA
+id <-which(!(dataset.new$Diagnosis54 %in% levels(dataset$Diagnosis54)))    
+dataset.new$Diagnosis54[id] <- NA
+id <-which(!(dataset.new$Diagnosis55 %in% levels(dataset$Diagnosis55)))    
+dataset.new$Diagnosis55[id] <- NA
+id <-which(!(dataset.new$Diagnosis56 %in% levels(dataset$Diagnosis56)))    
+dataset.new$Diagnosis56[id] <- NA
+id <-which(!(dataset.new$Diagnosis57 %in% levels(dataset$Diagnosis57)))    
+dataset.new$Diagnosis57[id] <- NA
+id <-which(!(dataset.new$Diagnosis58 %in% levels(dataset$Diagnosis58)))    
+dataset.new$Diagnosis58[id] <- NA
+id <-which(!(dataset.new$Diagnosis59 %in% levels(dataset$Diagnosis59)))    
+dataset.new$Diagnosis59[id] <- NA
+id <-which(!(dataset.new$Diagnosis60 %in% levels(dataset$Diagnosis60)))    
+dataset.new$Diagnosis60[id] <- NA
+id <-which(!(dataset.new$Diagnosis61 %in% levels(dataset$Diagnosis61)))    
+dataset.new$Diagnosis61[id] <- NA
+id <-which(!(dataset.new$Diagnosis62 %in% levels(dataset$Diagnosis62)))    
+dataset.new$Diagnosis62[id] <- NA
+id <-which(!(dataset.new$Diagnosis63 %in% levels(dataset$Diagnosis63)))    
+dataset.new$Diagnosis63[id] <- NA
+id <-which(!(dataset.new$Diagnosis64 %in% levels(dataset$Diagnosis64)))    
+dataset.new$Diagnosis64[id] <- NA
+id <-which(!(dataset.new$Diagnosis65 %in% levels(dataset$Diagnosis65)))    
+dataset.new$Diagnosis65[id] <- NA
+id <-which(!(dataset.new$Intervention1 %in% levels(dataset$Intervention1)))    
+dataset.new$Intervention1[id] <- NA
+id <-which(!(dataset.new$Intervention2 %in% levels(dataset$Intervention2)))    
+dataset.new$Intervention2[id] <- NA
+id <-which(!(dataset.new$Intervention3 %in% levels(dataset$Intervention3)))    
+dataset.new$Intervention3[id] <- NA
+id <-which(!(dataset.new$Intervention4 %in% levels(dataset$Intervention4)))    
+dataset.new$Intervention4[id] <- NA
+id <-which(!(dataset.new$Intervention5 %in% levels(dataset$Intervention5)))    
+dataset.new$Intervention5[id] <- NA
+id <-which(!(dataset.new$Intervention6 %in% levels(dataset$Intervention6)))    
+dataset.new$Intervention6[id] <- NA
+id <-which(!(dataset.new$Intervention7 %in% levels(dataset$Intervention7)))    
+dataset.new$Intervention7[id] <- NA
+id <-which(!(dataset.new$Intervention8 %in% levels(dataset$Intervention8)))    
+dataset.new$Intervention8[id] <- NA
+id <-which(!(dataset.new$Intervention9 %in% levels(dataset$Intervention9)))    
+dataset.new$Intervention9[id] <- NA
+id <-which(!(dataset.new$Intervention10 %in% levels(dataset$Intervention10)))    
+dataset.new$Intervention10[id] <- NA
+id <-which(!(dataset.new$Intervention11 %in% levels(dataset$Intervention11)))    
+dataset.new$Intervention11[id] <- NA
+id <-which(!(dataset.new$Intervention12 %in% levels(dataset$Intervention12)))    
+dataset.new$Intervention12[id] <- NA
+id <-which(!(dataset.new$Intervention13 %in% levels(dataset$Intervention13)))    
+dataset.new$Intervention13[id] <- NA
+id <-which(!(dataset.new$Intervention14 %in% levels(dataset$Intervention14)))    
+dataset.new$Intervention14[id] <- NA
+id <-which(!(dataset.new$Intervention15 %in% levels(dataset$Intervention15)))    
+dataset.new$Intervention15[id] <- NA
+id <-which(!(dataset.new$Intervention16 %in% levels(dataset$Intervention16)))    
+dataset.new$Intervention16[id] <- NA
+id <-which(!(dataset.new$Intervention17 %in% levels(dataset$Intervention17)))    
+dataset.new$Intervention17[id] <- NA
+id <-which(!(dataset.new$Intervention18 %in% levels(dataset$Intervention18)))    
+dataset.new$Intervention18[id] <- NA
+id <-which(!(dataset.new$Intervention19 %in% levels(dataset$Intervention19)))    
+dataset.new$Intervention19[id] <- NA
+id <-which(!(dataset.new$Intervention20 %in% levels(dataset$Intervention20)))    
+dataset.new$Intervention20[id] <- NA
+id <-which(!(dataset.new$Intervention21 %in% levels(dataset$Intervention21)))    
+dataset.new$Intervention21[id] <- NA
+id <-which(!(dataset.new$Intervention22 %in% levels(dataset$Intervention22)))    
+dataset.new$Intervention22[id] <- NA
+id <-which(!(dataset.new$Intervention23 %in% levels(dataset$Intervention23)))    
+dataset.new$Intervention23[id] <- NA
+id <-which(!(dataset.new$Intervention24 %in% levels(dataset$Intervention24)))    
+dataset.new$Intervention24[id] <- NA
+id <-which(!(dataset.new$Intervention25 %in% levels(dataset$Intervention25)))    
+dataset.new$Intervention25[id] <- NA
+id <-which(!(dataset.new$Intervention26 %in% levels(dataset$Intervention26)))    
+dataset.new$Intervention26[id] <- NA
+id <-which(!(dataset.new$Intervention27 %in% levels(dataset$Intervention27)))    
+dataset.new$Intervention27[id] <- NA
+id <-which(!(dataset.new$Intervention28 %in% levels(dataset$Intervention28)))    
+dataset.new$Intervention28[id] <- NA
+id <-which(!(dataset.new$Intervention29 %in% levels(dataset$Intervention29)))    
+dataset.new$Intervention29[id] <- NA
+id <-which(!(dataset.new$Intervention30 %in% levels(dataset$Intervention30)))    
+dataset.new$Intervention30[id] <- NA
+id <-which(!(dataset.new$Intervention31 %in% levels(dataset$Intervention31)))    
+dataset.new$Intervention31[id] <- NA
+id <-which(!(dataset.new$Intervention32 %in% levels(dataset$Intervention32)))    
+dataset.new$Intervention32[id] <- NA
+id <-which(!(dataset.new$Intervention33 %in% levels(dataset$Intervention33)))    
+dataset.new$Intervention33[id] <- NA
+id <-which(!(dataset.new$Intervention34 %in% levels(dataset$Intervention34)))    
+dataset.new$Intervention34[id] <- NA
+id <-which(!(dataset.new$Intervention35 %in% levels(dataset$Intervention35)))    
+dataset.new$Intervention35[id] <- NA
+id <-which(!(dataset.new$Intervention36 %in% levels(dataset$Intervention36)))    
+dataset.new$Intervention36[id] <- NA
+id <-which(!(dataset.new$Intervention37 %in% levels(dataset$Intervention37)))    
+dataset.new$Intervention37[id] <- NA
+id <-which(!(dataset.new$Intervention38 %in% levels(dataset$Intervention38)))    
+dataset.new$Intervention38[id] <- NA
+id <-which(!(dataset.new$Intervention39 %in% levels(dataset$Intervention39)))    
+dataset.new$Intervention39[id] <- NA
+id <-which(!(dataset.new$Intervention40 %in% levels(dataset$Intervention40)))    
+dataset.new$Intervention40[id] <- NA
+id <-which(!(dataset.new$Intervention41 %in% levels(dataset$Intervention41)))    
+dataset.new$Intervention41[id] <- NA
+id <-which(!(dataset.new$Intervention42 %in% levels(dataset$Intervention42)))    
+dataset.new$Intervention42[id] <- NA
+id <-which(!(dataset.new$Intervention43 %in% levels(dataset$Intervention43)))    
+dataset.new$Intervention43[id] <- NA
+id <-which(!(dataset.new$Intervention44 %in% levels(dataset$Intervention44)))    
+dataset.new$Intervention44[id] <- NA
+id <-which(!(dataset.new$Intervention45 %in% levels(dataset$Intervention45)))    
+dataset.new$Intervention45[id] <- NA
+id <-which(!(dataset.new$Intervention46 %in% levels(dataset$Intervention46)))    
+dataset.new$Intervention46[id] <- NA
+id <-which(!(dataset.new$Intervention47 %in% levels(dataset$Intervention47)))    
+dataset.new$Intervention47[id] <- NA
+id <-which(!(dataset.new$Intervention48 %in% levels(dataset$Intervention48)))    
+dataset.new$Intervention48[id] <- NA
+id <-which(!(dataset.new$Intervention49 %in% levels(dataset$Intervention49)))    
+dataset.new$Intervention49[id] <- NA
+id <-which(!(dataset.new$Intervention50 %in% levels(dataset$Intervention50)))    
+dataset.new$Intervention50[id] <- NA
+id <-which(!(dataset.new$Intervention51 %in% levels(dataset$Intervention51)))    
+dataset.new$Intervention51[id] <- NA
+id <-which(!(dataset.new$Intervention52 %in% levels(dataset$Intervention52)))    
+dataset.new$Intervention52[id] <- NA
+id <-which(!(dataset.new$Intervention53 %in% levels(dataset$Intervention53)))    
+dataset.new$Intervention53[id] <- NA
+id <-which(!(dataset.new$Intervention54 %in% levels(dataset$Intervention54)))    
+dataset.new$Intervention54[id] <- NA
+id <-which(!(dataset.new$Intervention55 %in% levels(dataset$Intervention55)))    
+dataset.new$Intervention55[id] <- NA
+id <-which(!(dataset.new$Intervention56 %in% levels(dataset$Intervention56)))    
+dataset.new$Intervention56[id] <- NA
+id <-which(!(dataset.new$Intervention57 %in% levels(dataset$Intervention57)))    
+dataset.new$Intervention57[id] <- NA
+id <-which(!(dataset.new$Intervention58 %in% levels(dataset$Intervention58)))    
+dataset.new$Intervention58[id] <- NA
+id <-which(!(dataset.new$Intervention59 %in% levels(dataset$Intervention59)))    
+dataset.new$Intervention59[id] <- NA
+id <-which(!(dataset.new$Intervention60 %in% levels(dataset$Intervention60)))    
+dataset.new$Intervention60[id] <- NA
+id <-which(!(dataset.new$Intervention61 %in% levels(dataset$Intervention61)))    
+dataset.new$Intervention61[id] <- NA
+id <-which(!(dataset.new$Intervention62 %in% levels(dataset$Intervention62)))    
+dataset.new$Intervention62[id] <- NA
+id <-which(!(dataset.new$Intervention63 %in% levels(dataset$Intervention63)))    
+dataset.new$Intervention63[id] <- NA
+id <-which(!(dataset.new$GenderDescription %in% levels(dataset$GenderDescription)))    
+dataset.new$GenderDescription[id] <- NA
+id <-which(!(dataset.new$PostalCode %in% levels(dataset$PostalCode)))    
+dataset.new$PostalCode[id] <- NA
+id <-which(!(dataset.new$FSA %in% levels(dataset$FSA)))    
+dataset.new$FSA[id] <- NA
+id <-which(!(dataset.new$EntryCode %in% levels(dataset$EntryCode)))    
+dataset.new$EntryCode[id] <- NA
+id <-which(!(dataset.new$ReadmitDescription %in% levels(dataset$ReadmitDescription)))    
+dataset.new$ReadmitDescription[id] <- NA
+id <-which(!(dataset.new$DischargeDispositionDescription %in% levels(dataset$DischargeDispositionDescription)))    
+dataset.new$DischargeDispositionDescription[id] <- NA
+id <-which(!(dataset.new$MCCDescription %in% levels(dataset$MCCDescription)))    
+dataset.new$MCCDescription[id] <- NA
+id <-which(!(dataset.new$CMGDescription %in% levels(dataset$CMGDescription)))    
+dataset.new$CMGDescription[id] <- NA
+id <-which(!(dataset.new$InpatientRIWAtypicalCodeDescription %in% levels(dataset$InpatientRIWAtypicalCodeDescription)))    
+dataset.new$InpatientRIWAtypicalCodeDescription[id] <- NA
+id <-which(!(dataset.new$HIGDescription %in% levels(dataset$HIGDescription)))    
+dataset.new$HIGDescription[id] <- NA
+id <-which(!(dataset.new$InstitutionFromDescription %in% levels(dataset$InstitutionFromDescription)))    
+dataset.new$InstitutionFromDescription[id] <- NA
+id <-which(!(dataset.new$ProviderName %in% levels(dataset$ProviderName)))    
+dataset.new$ProviderName[id] <- NA
+id <-which(!(dataset.new$PatientServiceDescription %in% levels(dataset$PatientServiceDescription)))
+dataset.new$PatientServiceDescription[id] <- NA
+id <-which(!(dataset.new$InterventionProviderNumberDesc %in% levels(dataset$InterventionProviderNumberDesc)))    
+dataset.new$InterventionProviderNumberDesc[id] <- NA
+dataset.new$AnaestheticTechniqueDescription[id] <- NA
+id <-which(!(dataset.new$OffService %in% levels(dataset$OffService)))    
+dataset.new$OffService[id] <- NA
+id <-which(!(dataset.new$WaitTimeER %in% levels(dataset$WaitTimeER)))    
+dataset.new$WaitTimeER[id] <- NA
+id <-which(!(dataset.new$DischargeNursingUnitCode %in% levels(dataset$DischargeNursingUnitCode)))    
+dataset.new$DischargeNursingUnitCode[id] <- NA
+id <-which(!(dataset.new$InterventionAttributeStatus %in% levels(dataset$InterventionAttributeStatus)))    
+dataset.new$InterventionAttributeStatus[id] <- NA
+id <-which(!(dataset.new$CMG_RIW %in% levels(dataset$CMG_RIW)))    
+dataset.new$CMG_RIW[id] <- NA
+id <-which(!(dataset.new$CMG_ELOS %in% levels(dataset$CMG_ELOS)))    
+dataset.new$CMG_ELOS[id] <- NA
+id <-which(!(dataset.new$IntervBodyLocation %in% levels(dataset$IntervBodyLocation)))    
+dataset.new$IntervBodyLocation[id] <- NA
+id <-which(!(dataset.new$SCUNumber %in% levels(dataset$SCUNumber)))    
+dataset.new$SCUNumber[id] <- NA
+
+
+dataset.new$AgeNumber <- as.factor(dataset.new$AgeNumber)  
+dataset.new$WaitTimeER <- as.numeric(dataset.new$WaitTimeER)
+dataset.new$EntryCode <- as.factor(dataset.new$EntryCode)
+dataset.new$HIGWeight  <- as.numeric(dataset.new$HIGWeight)
+dataset.new$HIGELOS  <- as.numeric(dataset.new$HIGELOS)
+dataset.new$LOSDays  <- as.numeric(dataset.new$LOSDays)
+dataset.new$AcuteLOS  <- as.numeric(dataset.new$AcuteLOS)
+dataset.new$ALCLOS  <- as.numeric(dataset.new$ALCLOS)
+dataset.new$SCULOS  <- as.numeric(dataset.new$SCULOS)
+dataset.new$SCUHours  <- as.numeric(dataset.new$SCUHours)
+dataset.new$SCUNumber <-as.factor(dataset.new$SCUNumber)
+dataset.new$CMG_RIW <-as.numeric(dataset.new$CMG_RIW)
+dataset.new$CMG_ELOS <-as.numeric(dataset.new$CMG_ELOS)
+dataset.new$IntervBodyLocation <-as.factor(dataset.new$IntervBodyLocation)
+dataset.new$HIGFlTotalCount <-as.numeric(dataset.new$HIGFlTotalCount)
+dataset.new$SCUNumber <-as.factor(dataset.new$SCUNumber)
+dataset.new$DischargeDispositionDescription <-as.factor(dataset.new$DischargeDispositionDescription)
+dataset.new$CMGDescription <-as.factor(dataset.new$CMGDescription)
+dataset.new$HIGDescription <-as.factor(dataset.new$HIGDescription)
+dataset.new$PatientServiceDescription <-as.factor(dataset.new$PatientServiceDescription)
+dataset.new$HIGTypicalAtypicalCode <-as.factor(dataset.new$HIGTypicalAtypicalCode)
+dataset.new$DischargeUnitKey <-as.numeric(dataset.new$DischargeUnitKey)
+
+
+#dataset.new$HIGFlTotalCount <- as.numeric(dataset.new$HIGFlTotalCount)
+
+#FI_CardioversionFlag
+#FI_CellSaverFlag
+#FI_ChemotherapyFlag
+#FI_DialysisFlag
+#FI_HeartResuscitationFlag
+#FI_MechanicalVentGreat96Hours
+#FI_MechanicalVentLess96Hours
+#FI_FeedingTubeFlag
+#FI_ParacentesisFlag
+#FI_ParenteralNutritionFlag
+#FI_PleurocentesisFlag
+#FI_RadiotherapyFlag
+#FI_TracheostomyFlag
+#FI_VascularAccessDdeviceFlag
+
+
+# Confusion Matrix, original dataset
+test <-predict(ada.vad, newdata = dataset, na.action=na.omit)
+table(true=dataset$FI_CardioversionFlag,pred=test)
+#write.csv(dataset, "Checks")
+#type= "prob"
+
+
+#load(file = 'Homecare_v2.RData')
+#test2 <-predict(ada.vad, newdata = dataset.new, na.action=na.omit,type = "prob")
+test2 <-predict(ada.vad, newdata = dataset.new, na.action=na.omit)
+table(true=dataset.new$FI_CardioversionFlag,pred=test2)
+#dataset.new$prediction <- test2
+#write.csv(dataset.new, "HomeCarev2")
+
+# Prediction of new dataset
+
+load(file = 'adaCardioversion.RData')
+
+test2 <-predict(ada.vad, newdata = dataset.new, na.action=na.omit,type = "prob")
+dataset.new$prediction <- test2
+write.csv(dataset.new, "Cardio")
+
+load(file = 'adaCellSavers_i150.RData')
+
+test2 <-predict(ada.vad, newdata = dataset.new, na.action=na.omit,type = "prob")
+dataset.new$prediction <- test2
+write.csv(dataset.new, "CellSaver")
+
+load(file = 'adaChemo.RData')
+
+test2 <-predict(ada.vad, newdata = dataset.new, na.action=na.omit,type = "prob")
+dataset.new$prediction <- test2
+write.csv(dataset.new, "Chemo")
+
+load(file = 'adaDialysis_i150.RData')
+
+test2 <-predict(ada.vad, newdata = dataset.new, na.action=na.omit,type = "prob")
+dataset.new$prediction <- test2
+write.csv(dataset.new, "Dialysis")
+
+load(file = 'adaFeeding_i150.RData')
+
+test2 <-predict(ada.vad, newdata = dataset.new, na.action=na.omit,type = "prob")
+dataset.new$prediction <- test2
+write.csv(dataset.new, "Feeding")
+
+load(file = 'adaHeartResus_i150.RData')
+
+test2 <-predict(ada.vad, newdata = dataset.new, na.action=na.omit,type = "prob")
+dataset.new$prediction <- test2
+write.csv(dataset.new, "Resus")
+
+load(file = 'adaMechgreater96.RData')
+
+test2 <-predict(ada.vad, newdata = dataset.new, na.action=na.omit,type = "prob")
+dataset.new$prediction <- test2
+write.csv(dataset.new, "Mechgreater96")
+
+load(file = 'adaMechless96_i150.RData')
+
+test2 <-predict(ada.vad, newdata = dataset.new, na.action=na.omit,type = "prob")
+dataset.new$prediction <- test2
+write.csv(dataset.new, "Mechless96")
+
+load(file = 'adaPara.RData')
+
+test2 <-predict(ada.vad, newdata = dataset.new, na.action=na.omit,type = "prob")
+dataset.new$prediction <- test2
+write.csv(dataset.new, "adaPara")
+
+load(file = 'adaParenteral_i150.RData')
+
+test2 <-predict(ada.vad, newdata = dataset.new, na.action=na.omit,type = "prob")
+dataset.new$prediction <- test2
+write.csv(dataset.new, "Parenteral")
+
+load(file = 'adaPleuro.RData')
+
+test2 <-predict(ada.vad, newdata = dataset.new, na.action=na.omit,type = "prob")
+dataset.new$prediction <- test2
+write.csv(dataset.new, "Pleuro")
+
+load(file = 'adaRadio.RData')
+
+test2 <-predict(ada.vad, newdata = dataset.new, na.action=na.omit,type = "prob")
+dataset.new$prediction <- test2
+write.csv(dataset.new, "Radio")
+
+load(file = 'adaTrach.RData')
+
+test2 <-predict(ada.vad, newdata = dataset.new, na.action=na.omit,type = "prob")
+dataset.new$prediction <- test2
+write.csv(dataset.new, "Trach")
+
+load(file = 'adaVAD_i300.RData')
+
+test2 <-predict(ada.vad, newdata = dataset.new, na.action=na.omit,type = "prob")
+dataset.new$prediction <- test2
+write.csv(dataset.new, "VAD")
