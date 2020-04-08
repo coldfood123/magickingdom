@@ -1,0 +1,82 @@
+library(arules)
+library(arulesViz)
+library(tidyverse)
+library(readxl)
+library(knitr)
+library(ggplot2)
+library(lubridate)
+library(plyr)
+library(dplyr)
+
+
+setwd("C:/Users/Peter Zhang/Desktop/Arules")
+############################### DATA CLEANING ####################################
+data <-read.csv("LowesONLYWeekly.csv", sep=",", header = TRUE)
+#complete.cases(data) will return a logical vector indicating which rows have no missing values. Then use the vector to get only rows that are complete using retail[,].
+data <- retail[complete.cases(data), ]
+#mutate function is from dplyr package. It is used to edit or add new columns to dataframe. Here Description column is being converted to factor column. as.factor converts column to factor column. %>% is an operator with which you may pipe values to another function or expression
+data %>% mutate(retailer_name = as.factor(retailer_name))
+
+#data$Trans_Date <- as.Date(data$Days.in.Date_Posted_Proper,format='%d/%m/%Y')
+
+colnames(data)[1] <- c("User_ID")
+colnames(data)[2] <- c("Trans_Date")
+colnames(data)[3] <- c("Name")
+colnames(data)[4] <- c("Count")
+colnames(data)[5] <- c("Spend")
+
+#glimpse(data)
+
+# This is used to creat "singles" format. ddply(dataframe, variables_to_be_used_to_split_data_frame, function_to_be_applied)
+transactionData <- ddply(data,c("User_ID","Trans_Date"),
+                         function(df1)paste(df1$Name,
+                                            collapse = ","))
+
+
+#The R function paste() concatenates vectors to character and separated results using collapse=[any optional charcater string ]. Here ',' is used
+
+#set column InvoiceNo of dataframe transactionData  
+transactionData$User_ID <- NULL
+#set column Date of dataframe transactionData
+transactionData$Trans_Date <- NULL
+#Rename column to items
+colnames(transactionData) <- c("items")
+
+
+write.csv(transactionData,"arules_lowes.csv", quote = FALSE, row.names = FALSE)
+#transactionData: Data to be written
+#"D:/Documents/market_basket.csv": location of file with file name to be written to
+#quote: If TRUE it will surround character or factor column with double quotes. If FALSE nothing will be quoted
+#row.names: either a logical value indicating whether the row names of x are to be written along with x, or a character vector of row names to be written.
+
+
+tr <- read.transactions('arules_lowes.csv', format = 'basket', sep=',')
+#sep tell how items are separated. In this case you have separated using ','
+#When you run the above lines of code you may get lots of EOF within quoted string in your output, don't worry about it.
+summary(tr)
+saveRDS(tr, file = "AruleTR.rds")
+
+# Create an item frequency plot for the top 20 items
+if (!require("RColorBrewer")) {
+  # install color package of R
+  install.packages("RColorBrewer")
+  #include library RColorBrewer
+  library(RColorBrewer)
+}
+itemFrequencyPlot(tr,topN=35,type="absolute",col=brewer.pal(8,'Pastel2'), main="Absolute Item Frequency Plot")
+
+
+#Generating Rules!!!! PICKLE RICK!!!!lower support min to reduce RAM usage
+association.rules <- apriori(tr, parameter = list(supp=0.01, conf=0.95,maxlen=10))
+association.rules <- apriori(tr, parameter = list(supp=0.00001, conf=0.9,maxlen=19),appearance = list(default="lhs",rhs="Shell"))
+association.rules <- apriori(tr, parameter = list(supp=0.0001, conf=0.2,maxlen=10),appearance = list(lhs="Lowes",default="rhs"))
+
+
+subset.rules <- which(colSums(is.subset(association.rules, association.rules)) > 1) # get subset rules in vector
+length(subset.rules)  #> 3913
+subset.association.rules. <- association.rules[-subset.rules] # remove subset rules.
+
+
+inspect(subset.association.rules.)
+inspect(association.rules)
+inspect(association.rules[1:20])
